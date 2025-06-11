@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Análise Chamados CMSP</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+        const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, LineChart, Line, ResponsiveContainer, ScatterChart, Scatter } = Recharts;
+
+        const Dashboard = () => {
+            const [activeTab, setActiveTab] = useState('overview');
+
+            // Dados dos chamados
+            const chamados = [
+                {
+                    id: 'STR 68291',
+                    titulo: 'Ajustes na aplicação Ficha Funcional do Servidor',
+                    prazoContratual: 30,
+                    prazoReal: 37,
+                    atraso: 7,
+                    valor: 0,
+                    status: 'Entregue com atraso',
+                    reaberturas: 3,
+                    dataInicio: '2025-01-28',
+                    dataEntrega: '2025-03-05',
+                    categoria: 'Desenvolvimento'
+                },
+                {
+                    id: 'STR 68292',
+                    titulo: 'Integração do SIM ao sistema de consulta situação cadastral',
+                    prazoContratual: 60,
+                    prazoReal: 27,
+                    atraso: 0,
+                    valor: 31940,
+                    status: 'Entregue no prazo',
+                    reaberturas: 1,
+                    dataInicio: '2025-02-06',
+                    dataEntrega: '2025-03-05',
+                    categoria: 'Integração'
+                },
+                {
+                    id: 'STR 68293',
+                    titulo: 'Aplicação Banco de Horas',
+                    prazoContratual: 55,
+                    prazoReal: 34,
+                    atraso: 0,
+                    valor: 24852.20,
+                    status: 'Entregue no prazo',
+                    reaberturas: 5,
+                    dataInicio: '2025-02-06',
+                    dataEntrega: '2025-03-12',
+                    categoria: 'Desenvolvimento'
+                },
+                {
+                    id: 'STR 68588',
+                    titulo: 'Desenvolvimento de aplicação para geração do arquivo TXT PREVCOM',
+                    prazoContratual: 30,
+                    prazoReal: 75,
+                    atraso: 45,
+                    valor: 15130,
+                    status: 'Entregue com atraso',
+                    reaberturas: 2,
+                    dataInicio: '2025-02-14',
+                    dataEntrega: '2025-04-30',
+                    categoria: 'Desenvolvimento'
+                },
+                {
+                    id: 'STR 68591',
+                    titulo: 'Tela de Cálculo',
+                    prazoContratual: 38,
+                    prazoReal: 19,
+                    atraso: 0,
+                    valor: 18690,
+                    status: 'Entregue antecipadamente',
+                    reaberturas: 0,
+                    dataInicio: '2025-02-14',
+                    dataEntrega: '2025-03-05',
+                    categoria: 'Melhoria'
+                },
+                {
+                    id: 'STR 68592',
+                    titulo: 'Índice das Rubricas de Pensão',
+                    prazoContratual: 23,
+                    prazoReal: 26,
+                    atraso: 3,
+                    valor: 8722,
+                    status: 'Entregue com atraso',
+                    reaberturas: 1,
+                    dataInicio: '2025-02-14',
+                    dataEntrega: '2025-03-11',
+                    categoria: 'Melhoria'
+                },
+                {
+                    id: 'STR 68599',
+                    titulo: 'Grid - Localizar em Várias Aplicações',
+                    prazoContratual: 20,
+                    prazoReal: 19,
+                    atraso: 0,
+                    valor: 6230,
+                    status: 'Entregue no prazo',
+                    reaberturas: 4,
+                    dataInicio: '2025-02-14',
+                    dataEntrega: '2025-03-05',
+                    categoria: 'Padronização'
+                },
+                {
+                    id: 'STR 68602',
+                    titulo: 'Verificador de Pendências no eSocial',
+                    prazoContratual: 55,
+                    prazoReal: 0,
+                    atraso: 0,
+                    valor: 25810,
+                    status: 'Em desenvolvimento',
+                    reaberturas: 0,
+                    dataInicio: '2025-02-14',
+                    dataEntrega: null,
+                    categoria: 'Integração'
+                },
+                {
+                    id: 'STR 68605',
+                    titulo: 'Envio de dados dos contribuintes individuais ao eSocial',
+                    prazoContratual: 30,
+                    prazoReal: 0,
+                    atraso: 0,
+                    valor: 0,
+                    status: 'Aguardando cliente',
+                    reaberturas: 0,
+                    dataInicio: '2025-03-10',
+                    dataEntrega: null,
+                    categoria: 'Integração'
+                },
+                {
+                    id: 'STR 68699',
+                    titulo: 'Adições à tela de favoritos',
+                    prazoContratual: 30,
+                    prazoReal: 27,
+                    atraso: 0,
+                    valor: 14240,
+                    status: 'Entregue no prazo',
+                    reaberturas: 2,
+                    dataInicio: '2025-02-14',
+                    dataEntrega: '2025-03-13',
+                    categoria: 'Melhoria'
+                },
+                {
+                    id: 'STR 68700',
+                    titulo: 'Melhorar a interface para a criação dos grupos de cálculo',
+                    prazoContratual: 25,
+                    prazoReal: 0,
+                    atraso: 0,
+                    valor: 7120,
+                    status: 'Em homologação',
+                    reaberturas: 0,
+                    dataInicio: '2025-02-13',
+                    dataEntrega: null,
+                    categoria: 'Melhoria'
+                }
+            ];
+
+            // Cálculos para métricas
+            const totalChamados = chamados.length;
+            const chamadosEntregues = chamados.filter(c => c.status.includes('Entregue')).length;
+            const chamadosAtrasados = chamados.filter(c => c.atraso > 0).length;
+            const valorTotal = chamados.reduce((sum, c) => sum + c.valor, 0);
+            const totalReaberturas = chamados.reduce((sum, c) => sum + c.reaberturas, 0);
+
+            // Dados para gráficos
+            const statusData = [
+                { name: 'Entregue no prazo', value: chamados.filter(c => c.status === 'Entregue no prazo').length, color: '#10B981' },
+                { name: 'Entregue com atraso', value: chamados.filter(c => c.status === 'Entregue com atraso').length, color: '#F59E0B' },
+                { name: 'Entregue antecipadamente', value: chamados.filter(c => c.status === 'Entregue antecipadamente').length, color: '#3B82F6' },
+                { name: 'Em desenvolvimento', value: chamados.filter(c => c.status === 'Em desenvolvimento').length, color: '#8B5CF6' },
+                { name: 'Aguardando cliente', value: chamados.filter(c => c.status === 'Aguardando cliente').length, color: '#EF4444' },
+                { name: 'Em homologação', value: chamados.filter(c => c.status === 'Em homologação').length, color: '#06B6D4' }
+            ];
+
+            const categoriaData = chamados.reduce((acc, chamado) => {
+                const categoria = chamado.categoria;
+                const existing = acc.find(item => item.name === categoria);
+                if (existing) {
+                    existing.quantidade += 1;
+                    existing.valor += chamado.valor;
+                } else {
+                    acc.push({ name: categoria, quantidade: 1, valor: chamado.valor });
+                }
+                return acc;
+            }, []);
+
+            const prazoData = chamados.filter(c => c.prazoReal > 0).map(c => ({
+                id: c.id.split(' ')[1],
+                prazoContratual: c.prazoContratual,
+                prazoReal: c.prazoReal,
+                atraso: c.atraso
+            }));
+
+            const reaberturasData = chamados.map(c => ({
+                id: c.id.split(' ')[1],
+                reaberturas: c.reaberturas,
+                valor: c.valor
+            }));
+
+            const KPICard = ({ icon, title, value, subtitle, color = "blue" }) => {
+                const iconElement = React.createElement(lucide[icon], {
+                    className: `h-6 w-6 ${color === "blue" ? "text-blue-600" : color === "green" ? "text-green-600" : color === "yellow" ? "text-yellow-600" : "text-red-600"}`
+                });
+
+                return React.createElement('div', {
+                    className: "bg-white rounded-lg shadow-md p-6 border-l-4",
+                    style: { borderLeftColor: color === "blue" ? "#3B82F6" : color === "green" ? "#10B981" : color === "yellow" ? "#F59E0B" : "#EF4444" }
+                }, [
+                    React.createElement('div', { className: "flex items-center", key: "content" }, [
+                        React.createElement('div', {
+                            className: `p-3 rounded-full ${color === "blue" ? "bg-blue-100" : color === "green" ? "bg-green-100" : color === "yellow" ? "bg-yellow-100" : "bg-red-100"}`,
+                            key: "icon"
+                        }, iconElement),
+                        React.createElement('div', { className: "ml-4", key: "text" }, [
+                            React.createElement('p', { className: "text-sm font-medium text-gray-600", key: "title" }, title),
+                            React.createElement('p', { className: "text-2xl font-bold text-gray-900", key: "value" }, value),
+                            subtitle && React.createElement('p', { className: "text-sm text-gray-500", key: "subtitle" }, subtitle)
+                        ])
+                    ])
+                ]);
+            };
+
+            return React.createElement('div', { className: "min-h-screen bg-gray-100 p-6" }, [
+                React.createElement('div', { className: "max-w-7xl mx-auto", key: "container" }, [
+                    // Header
+                    React.createElement('div', { className: "mb-8", key: "header" }, [
+                        React.createElement('h1', { className: "text-3xl font-bold text-gray-900 mb-2" }, "Dashboard - Análise Chamados CMSP"),
+                        React.createElement('p', { className: "text-gray-600" }, "Análise detalhada do desempenho dos chamados da AVMB para CMSP")
+                    ]),
+
+                    // Navegação por abas
+                    React.createElement('div', { className: "mb-6", key: "tabs" }, [
+                        React.createElement('div', { className: "border-b border-gray-200" }, [
+                            React.createElement('nav', { className: "-mb-px flex space-x-8" }, [
+                                { key: 'overview', label: 'Visão Geral' },
+                                { key: 'performance', label: 'Performance' },
+                                { key: 'financeiro', label: 'Financeiro' },
+                                { key: 'detalhes', label: 'Detalhes' }
+                            ].map(tab => 
+                                React.createElement('button', {
+                                    key: tab.key,
+                                    onClick: () => setActiveTab(tab.key),
+                                    className: `py-2 px-4 border-b-2 font-medium text-sm ${
+                                        activeTab === tab.key
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`
+                                }, tab.label)
+                            ))
+                        ])
+                    ]),
+
+                    // Conteúdo das abas
+                    activeTab === 'overview' && React.createElement('div', { className: "space-y-6", key: "overview-content" }, [
+                        // KPIs principais
+                        React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6", key: "kpis" }, [
+                            React.createElement(KPICard, {
+                                icon: 'Activity',
+                                title: "Total de Chamados",
+                                value: totalChamados,
+                                color: "blue",
+                                key: "kpi1"
+                            }),
+                            React.createElement(KPICard, {
+                                icon: 'CheckCircle',
+                                title: "Chamados Entregues",
+                                value: chamadosEntregues,
+                                subtitle: `${((chamadosEntregues/totalChamados)*100).toFixed(1)}% do total`,
+                                color: "green",
+                                key: "kpi2"
+                            }),
+                            React.createElement(KPICard, {
+                                icon: 'AlertTriangle',
+                                title: "Chamados Atrasados",
+                                value: chamadosAtrasados,
+                                subtitle: `${((chamadosAtrasados/totalChamados)*100).toFixed(1)}% do total`,
+                                color: "yellow",
+                                key: "kpi3"
+                            }),
+                            React.createElement(KPICard, {
+                                icon: 'XCircle',
+                                title: "Total de Reaberturas",
+                                value: totalReaberturas,
+                                subtitle: `${(totalReaberturas/totalChamados).toFixed(1)} por chamado`,
+                                color: "red",
+                                key: "kpi4"
+                            })
+                        ]),
+
+                        // Gráficos principais
+                        React.createElement('div', { className: "grid grid-cols-1 lg:grid-cols-2 gap-6", key: "charts" }, [
+                            // Status dos chamados
+                            React.createElement('div', { className: "bg-white rounded-lg shadow-md p-6", key: "status-chart" }, [
+                                React.createElement('h3', { className: "text-lg font-semibold mb-4" }, "Status dos Chamados"),
+                                React.createElement('div', { className: "h-64" }, [
+                                    React.createElement(ResponsiveContainer, { width: "100%", height: "100%" }, [
+                                        React.createElement(PieChart, {}, [
+                                            React.createElement(Pie, {
+                                                data: statusData,
+                                                cx: "50%",
+                                                cy: "50%",
+                                                labelLine: false,
+                                                label: ({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`,
+                                                outerRadius: 80,
+                                                fill: "#8884d8",
+                                                dataKey: "value"
+                                            }, statusData.map((entry, index) => 
+                                                React.createElement(Cell, { key: `cell-${index}`, fill: entry.color })
+                                            )),
+                                            React.createElement(Tooltip, {})
+                                        ])
+                                    ])
+                                ])
+                            ]),
+
+                            // Distribuição por categoria
+                            React.createElement('div', { className: "bg-white rounded-lg shadow-md p-6", key: "category-chart" }, [
+                                React.createElement('h3', { className: "text-lg font-semibold mb-4" }, "Chamados por Categoria"),
+                                React.createElement('div', { className: "h-64" }, [
+                                    React.createElement(ResponsiveContainer, { width: "100%", height: "100%" }, [
+                                        React.createElement(BarChart, { data: categoriaData }, [
+                                            React.createElement(CartesianGrid, { strokeDasharray: "3 3" }),
+                                            React.createElement(XAxis, { dataKey: "name" }),
+                                            React.createElement(YAxis, {}),
+                                            React.createElement(Tooltip, {}),
+                                            React.createElement(Bar, { dataKey: "quantidade", fill: "#3B82F6" })
+                                        ])
+                                    ])
+                                ])
+                            ])
+                        ])
+                    ])
+                ])
+            ]);
+        };
+
+        ReactDOM.render(React.createElement(Dashboard), document.getElementById('root'));
+    </script>
+</body>
+</html>
