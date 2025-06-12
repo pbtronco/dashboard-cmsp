@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, RadialBarChart, RadialBar, PolarAngleAxis } from 'recharts';
-import { LayoutDashboard, Clock, Target, ShieldCheck, Zap, BarChart3, AlertCircle, List, X, Menu } from 'lucide-react';
+import { LayoutDashboard, Clock, Target, ShieldCheck, Zap, BarChart3, AlertCircle, List } from 'lucide-react';
 
 // Para usar este componente, cole-o no seu ficheiro App.js
 // e instale as dependências necessárias com:
@@ -9,7 +9,6 @@ import { LayoutDashboard, Clock, Target, ShieldCheck, Zap, BarChart3, AlertCircl
 
 export default function App() {
   const [activeView, setActiveView] = useState('dashboard');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Dados consolidados e enriquecidos com base na análise estratégica
   const chamados = [
@@ -48,27 +47,49 @@ export default function App() {
   ].sort((a, b) => a.id.localeCompare(b.id));
 
   // --- Cálculos para os Gráficos e KPIs ---
+
   const totalChamados = chamados.length;
   const chamadosFinalizados = chamados.filter(c => c.status === 'Antecipado' || c.status === 'No Prazo' || c.status === 'Entregue com Atraso');
   const chamadosEmAndamento = totalChamados - chamadosFinalizados.length;
   const entregasNoPrazoOuMelhor = chamados.filter(c => c.status === 'Antecipado' || c.status === 'No Prazo').length;
   const taxaSucessoPrazo = Math.round((entregasNoPrazoOuMelhor / chamadosFinalizados.length) * 100);
+
   const performanceEntrega = [
     { name: 'Antecipado', value: chamados.filter(c => c.status === 'Antecipado').length, fill: '#22c55e' },
     { name: 'No Prazo', value: chamados.filter(c => c.status === 'No Prazo').length, fill: '#3b82f6' },
     { name: 'Atraso Justificado', value: chamados.filter(c => c.status === 'Entregue com Atraso' && c.justificativaAtraso !== 'Causa Interna').length, fill: '#f97316' },
     { name: 'Atraso Interno', value: chamados.filter(c => c.status === 'Entregue com Atraso' && c.justificativaAtraso === 'Causa Interna').length, fill: '#ef4444' },
   ];
-  const contagemCategorias = chamados.reduce((acc, c) => { acc[c.categoria] = (acc[c.categoria] || 0) + 1; return acc; }, {});
+  
+  const contagemCategorias = chamados.reduce((acc, c) => {
+    acc[c.categoria] = (acc[c.categoria] || 0) + 1;
+    return acc;
+  }, {});
   const dadosCategorias = Object.keys(contagemCategorias).map(cat => ({ name: cat, value: contagemCategorias[cat] }));
-  const contagemJustificativas = chamados.filter(c => c.justificativaAtraso).reduce((acc, c) => { acc[c.justificativaAtraso] = (acc[c.justificativaAtraso] || 0) + 1; return acc; }, {});
-  const dadosJustificativas = Object.keys(contagemJustificativas).map((key, index) => ({ name: key, value: contagemJustificativas[key], fill: ['#fb923c', '#fcd34d', '#a78bfa', '#f87171'][index % 4] }));
-  const contagemReaberturas = chamados.filter(c => c.naturezaReabertura).reduce((acc, c) => { acc[c.naturezaReabertura] = (acc[c.naturezaReabertura] || 0) + 1; return acc; }, {});
-  const dadosNaturezaReaberturas = Object.keys(contagemReaberturas).map((key, index) => ({ name: key, value: contagemReaberturas[key], fill: ['#60a5fa', '#818cf8', '#c084fc', '#a3e635'][index % 4] }));
+  
+  const contagemJustificativas = chamados.filter(c => c.justificativaAtraso).reduce((acc, c) => {
+    acc[c.justificativaAtraso] = (acc[c.justificativaAtraso] || 0) + 1;
+    return acc;
+  }, {});
+  const dadosJustificativas = Object.keys(contagemJustificativas).map((key, index) => ({
+    name: key,
+    value: contagemJustificativas[key],
+    fill: ['#fb923c', '#fcd34d', '#a78bfa', '#f87171'][index % 4],
+  }));
 
-  // --- Componentes da UI ---
+  const contagemReaberturas = chamados.filter(c => c.naturezaReabertura).reduce((acc, c) => {
+    acc[c.naturezaReabertura] = (acc[c.naturezaReabertura] || 0) + 1;
+    return acc;
+  }, {});
+  const dadosNaturezaReaberturas = Object.keys(contagemReaberturas).map((key, index) => ({
+    name: key,
+    value: contagemReaberturas[key],
+    fill: ['#60a5fa', '#818cf8', '#c084fc', '#a3e635'][index % 4],
+  }));
+
+
   const SideBar = () => (
-    <aside className="w-64 bg-gray-800 text-white flex-shrink-0 flex-col">
+    <aside className="w-64 bg-gray-800 text-white flex-shrink-0">
       <div className="p-6">
         <h2 className="text-2xl font-bold">Análise CMSP</h2>
       </div>
@@ -86,10 +107,7 @@ export default function App() {
   const MenuItem = ({ icon: Icon, label, view }) => (
     <li>
       <button
-        onClick={() => {
-          setActiveView(view);
-          if (isSidebarOpen) setIsSidebarOpen(false);
-        }}
+        onClick={() => setActiveView(view)}
         className={`w-full flex items-center px-6 py-3 text-left transition-colors duration-200 ${activeView === view ? 'bg-gray-700 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}`}
       >
         <Icon className="h-5 w-5 mr-3" />
@@ -99,7 +117,7 @@ export default function App() {
   );
 
   const KpiCard = ({ title, value, icon: Icon, color, subtitle }) => (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
       <div className="flex items-center">
         <div className={`p-3 rounded-full mr-4 ${color.bg}`}>
           <Icon className={`h-6 w-6 ${color.text}`} />
@@ -112,9 +130,176 @@ export default function App() {
       </div>
     </div>
   );
+
+  const renderContent = () => {
+    switch (activeView) {
+      case 'dashboard': return <DashboardView />;
+      case 'prazos': return <PrazosView />;
+      case 'qualidade': return <QualidadeView />;
+      case 'lista': return <ListaView />;
+      default: return <DashboardView />;
+    }
+  };
+
+  const DashboardView = () => (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <KpiCard title="Total de Projetos" value={totalChamados} icon={BarChart3} color={{bg: 'bg-blue-100', text: 'text-blue-600'}} />
+        <KpiCard title="Projetos em Andamento" value={chamadosEmAndamento} icon={Zap} color={{bg: 'bg-yellow-100', text: 'text-yellow-600'}} />
+        <KpiCard title="Taxa de Sucesso no Prazo" value={`${taxaSucessoPrazo}%`} icon={Target} color={{bg: 'bg-green-100', text: 'text-green-600'}} subtitle={`${entregasNoPrazoOuMelhor} de ${chamadosFinalizados.length} projetos finalizados`} />
+        <KpiCard title="Total de Reaberturas" value={chamados.reduce((a, b) => a + b.reaberturas, 0)} icon={AlertCircle} color={{bg: 'bg-orange-100', text: 'text-orange-600'}} />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartCard title="Performance de Entrega (Projetos Finalizados)">
+          <PieChart>
+            <Pie data={performanceEntrega} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label={({ name, value }) => `${name}: ${value}`}>
+              {performanceEntrega.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.fill} />)}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ChartCard>
+        <ChartCard title="Foco do Cliente (Categorias)">
+            <BarChart data={dadosCategorias} layout="vertical" margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis type="category" dataKey="name" />
+                <Tooltip />
+                <Bar dataKey="value" fill="#8884d8" name="Nº de Chamados" />
+            </BarChart>
+        </ChartCard>
+        <ChartCard title="Causas dos Atrasos">
+             <RadialBarChart innerRadius="30%" outerRadius="100%" data={dadosJustificativas} startAngle={180} endAngle={0} cy="70%">
+                <PolarAngleAxis type="number" domain={[0, 15]} angleAxisId={0} tick={false} />
+                <RadialBar background dataKey="value" angleAxisId={0} data={dadosJustificativas} />
+                <Tooltip />
+                <Legend iconSize={10} layout="vertical" verticalAlign="middle" align="right" />
+            </RadialBarChart>
+        </ChartCard>
+         <ChartCard title="Natureza das Reaberturas">
+            <RadialBarChart innerRadius="30%" outerRadius="100%" data={dadosNaturezaReaberturas} startAngle={180} endAngle={0} cy="70%">
+                <PolarAngleAxis type="number" domain={[0, 15]} angleAxisId={0} tick={false} />
+                <RadialBar background dataKey="value" angleAxisId={0} data={dadosNaturezaReaberturas} />
+                <Tooltip />
+                <Legend iconSize={10} layout="vertical" verticalAlign="middle" align="right" />
+            </RadialBarChart>
+        </ChartCard>
+      </div>
+    </>
+  );
   
+  const PrazosView = () => (
+     <div className="space-y-6">
+        <ChartCard title="Comparativo de Prazos (Contratual vs. Real)">
+             <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={chamadosFinalizados.map(c => ({name: c.id.replace('STR ', ''), Contratual: c.prazoContratual, Real: c.prazoReal}))}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} interval={0} />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="Contratual" fill="#3b82f6" />
+                  <Bar dataKey="Real" fill="#ef4444" />
+                </BarChart>
+            </ResponsiveContainer>
+        </ChartCard>
+         <ChartCard title="Análise de Atrasos">
+            <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Chamado</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Atraso (dias)</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Justificativa</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {chamados.filter(c=> c.status === 'Entregue com Atraso').map(c => (
+                      <tr key={c.id}>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm">{c.id}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm">{c.prazoReal - c.prazoContratual}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm">{c.justificativaAtraso || 'N/A'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+            </div>
+        </ChartCard>
+     </div>
+  );
+  
+  const QualidadeView = () => (
+      <div className="space-y-6">
+        <ChartCard title="Reaberturas por Projeto">
+            <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={chamados.filter(c => c.reaberturas > 0).map(c => ({name: c.id.replace('STR ', ''), Reaberturas: c.reaberturas}))}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} interval={0} />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="Reaberturas" fill="#f97316" />
+                </BarChart>
+            </ResponsiveContainer>
+        </ChartCard>
+        <ChartCard title="Análise da Natureza das Reaberturas">
+            <div className="overflow-x-auto">
+                 <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Chamado</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Reaberturas</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Natureza Principal</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {chamados.filter(c=> c.reaberturas > 0).map(c => (
+                      <tr key={c.id}>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm">{c.id}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm">{c.reaberturas}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm">{c.naturezaReabertura || 'Não Classificada'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+            </div>
+        </ChartCard>
+    </div>
+  );
+
+  const ListaView = () => (
+     <ChartCard title="Lista Detalhada de Todos os Projetos">
+         <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">ID</th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Título</th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Categoria</th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Status</th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Prazo Real/Cont.</th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Reaberturas</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {chamados.map(c => (
+                      <tr key={c.id}>
+                        <td className="px-4 py-2 whitespace-nowrap font-medium">{c.id}</td>
+                        <td className="px-4 py-2 whitespace-nowrap">{c.titulo}</td>
+                        <td className="px-4 py-2 whitespace-nowrap">{c.categoria}</td>
+                        <td className="px-4 py-2 whitespace-nowrap">{c.status}</td>
+                        <td className="px-4 py-2 whitespace-nowrap">{c.prazoReal ? `${c.prazoReal}/${c.prazoContratual}`: `-/${c.prazoContratual}`}</td>
+                        <td className="px-4 py-2 whitespace-nowrap">{c.reaberturas}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+            </div>
+     </ChartCard>
+  );
+
   const ChartCard = ({ title, children }) => (
-    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-100">
+    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
       <ResponsiveContainer width="100%" height={300}>
         {children}
@@ -122,67 +307,12 @@ export default function App() {
     </div>
   );
 
-  const Header = () => (
-    <header className="md:hidden bg-white shadow-sm p-4 flex justify-between items-center sticky top-0 z-10">
-      <h2 className="text-xl font-bold text-gray-800">Análise CMSP</h2>
-      <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-        <Menu className="h-6 w-6 text-gray-700" />
-      </button>
-    </header>
-  );
-  
-  // --- Vistas do Dashboard ---
-  const DashboardView = () => (
-    <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <KpiCard title="Total de Projetos" value={totalChamados} icon={BarChart3} color={{bg: 'bg-blue-100', text: 'text-blue-600'}} />
-        <KpiCard title="Projetos Ativos" value={chamadosEmAndamento} icon={Zap} color={{bg: 'bg-yellow-100', text: 'text-yellow-600'}} />
-        <KpiCard title="Sucesso no Prazo" value={`${taxaSucessoPrazo}%`} icon={Target} color={{bg: 'bg-green-100', text: 'text-green-600'}} subtitle={`${entregasNoPrazoOuMelhor} de ${chamadosFinalizados.length} projetos`} />
-        <KpiCard title="Total Reaberturas" value={chamados.reduce((a, b) => a + b.reaberturas, 0)} icon={AlertCircle} color={{bg: 'bg-orange-100', text: 'text-orange-600'}} />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="Performance de Entrega"><PieChart><Pie data={performanceEntrega} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label={({ name, value }) => `${name}: ${value}`}><Cell fill="#22c55e" /><Cell fill="#3b82f6" /><Cell fill="#f97316" /><Cell fill="#ef4444" /></Pie><Tooltip /><Legend /></PieChart></ChartCard>
-        <ChartCard title="Foco do Cliente"><BarChart data={dadosCategorias} layout="vertical" margin={{left: 20}}><CartesianGrid strokeDasharray="3 3" /><XAxis type="number" /><YAxis type="category" dataKey="name" width={100} /><Tooltip /><Bar dataKey="value" fill="#8884d8" name="Nº de Chamados" /></BarChart></ChartCard>
-        <ChartCard title="Causas dos Atrasos"><RadialBarChart innerRadius="30%" outerRadius="100%" data={dadosJustificativas} startAngle={180} endAngle={0} cy="70%"><PolarAngleAxis type="number" domain={[0, 15]} tick={false} /><RadialBar background dataKey="value" /><Tooltip /><Legend iconSize={10} layout="vertical" verticalAlign="middle" align="right" /></RadialBarChart></ChartCard>
-        <ChartCard title="Natureza das Reaberturas"><RadialBarChart innerRadius="30%" outerRadius="100%" data={dadosNaturezaReaberturas} startAngle={180} endAngle={0} cy="70%"><PolarAngleAxis type="number" domain={[0, 15]} tick={false} /><RadialBar background dataKey="value" /><Tooltip /><Legend iconSize={10} layout="vertical" verticalAlign="middle" align="right" /></RadialBarChart></ChartCard>
-      </div>
-    </>
-  );
-  
-  const PrazosView = () => ( <div className="space-y-6"><ChartCard title="Comparativo de Prazos (Contratual vs. Real)"><ResponsiveContainer width="100%" height={400}><BarChart data={chamadosFinalizados.map(c => ({name: c.id.replace('STR ', ''), Contratual: c.prazoContratual, Real: c.prazoReal}))} margin={{bottom: 60}}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" angle={-60} textAnchor="end" interval={0} /><YAxis /><Tooltip /><Legend /><Bar dataKey="Contratual" fill="#3b82f6" /><Bar dataKey="Real" fill="#ef4444" /></BarChart></ResponsiveContainer></ChartCard><ChartCard title="Análise de Atrasos"><div className="overflow-x-auto"><table className="min-w-full divide-y divide-gray-200"><thead><tr><th className="th">Chamado</th><th className="th">Atraso (dias)</th><th className="th">Justificativa</th></tr></thead><tbody className="bg-white divide-y divide-gray-200">{chamados.filter(c=> c.status === 'Entregue com Atraso').map(c => (<tr key={c.id}><td className="td">{c.id}</td><td className="td">{c.prazoReal - c.prazoContratual}</td><td className="td">{c.justificativaAtraso || 'N/A'}</td></tr>))}</tbody></table></div></ChartCard></div>);
-  const QualidadeView = () => ( <div className="space-y-6"><ChartCard title="Reaberturas por Projeto"><ResponsiveContainer width="100%" height={400}><BarChart data={chamados.filter(c => c.reaberturas > 0).map(c => ({name: c.id.replace('STR ', ''), Reaberturas: c.reaberturas}))} margin={{bottom: 60}}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" angle={-60} textAnchor="end" interval={0} /><YAxis allowDecimals={false} /><Tooltip /><Legend /><Bar dataKey="Reaberturas" fill="#f97316" /></BarChart></ResponsiveContainer></ChartCard><ChartCard title="Análise da Natureza das Reaberturas"><div className="overflow-x-auto"><table className="min-w-full divide-y divide-gray-200"><thead><tr><th className="th">Chamado</th><th className="th">Reaberturas</th><th className="th">Natureza</th></tr></thead><tbody className="bg-white divide-y divide-gray-200">{chamados.filter(c=> c.reaberturas > 0).map(c => (<tr key={c.id}><td className="td">{c.id}</td><td className="td">{c.reaberturas}</td><td className="td">{c.naturezaReabertura || 'Não Classificada'}</td></tr>))}</tbody></table></div></ChartCard></div>);
-  const ListaView = () => (<div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-100"><h3 className="text-lg font-semibold text-gray-800 mb-4">Lista Detalhada de Todos os Projetos</h3><div className="overflow-x-auto"><table className="min-w-full divide-y divide-gray-200 text-sm"><thead><tr><th className="th">ID</th><th className="th">Título</th><th className="th">Categoria</th><th className="th">Status</th><th className="th">Prazo</th><th className="th">Reaberturas</th></tr></thead><tbody className="bg-white divide-y divide-gray-200">{chamados.map(c => (<tr key={c.id} className="hover:bg-gray-50"><td className="td font-medium">{c.id}</td><td className="td max-w-xs truncate" title={c.titulo}>{c.titulo}</td><td className="td">{c.categoria}</td><td className="td"><span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${c.status === 'Antecipado' ? 'bg-green-100 text-green-800' : c.status === 'No Prazo' ? 'bg-blue-100 text-blue-800' : c.status === 'Entregue com Atraso' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>{c.status}</span></td><td className="td">{c.prazoReal ? `${c.prazoReal}/${c.prazoContratual}`: `-/${c.prazoContratual}`}</td><td className="td text-center">{c.reaberturas}</td></tr>))}</tbody></table></div></div>);
-  
-  // Estrutura principal da aplicação com layout responsivo
   return (
     <div className="flex h-screen bg-gray-100 font-sans">
-      {/* Sidebar para ecrãs grandes */}
-      <div className="hidden md:flex flex-shrink-0">
-        <SideBar />
-      </div>
-
-      {/* Overlay para o sidebar em mobile */}
-      {isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black opacity-50 z-20 md:hidden"></div>}
-      
-      {/* Sidebar para mobile (desliza da esquerda) */}
-      <div className={`fixed top-0 left-0 h-full z-30 transform transition-transform duration-300 ease-in-out md:hidden ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <SideBar />
-      </div>
-
-      <main className="flex-1 flex flex-col overflow-y-auto">
-        <Header />
-        <div className="p-4 sm:p-6 lg:p-8">
-            {activeView === 'dashboard' && <DashboardView />}
-            {activeView === 'prazos' && <PrazosView />}
-            {activeView === 'qualidade' && <QualidadeView />}
-            {activeView === 'lista' && <ListaView />}
-        </div>
+      <SideBar />
+      <main className="flex-1 p-8 overflow-y-auto">
+        {renderContent()}
       </main>
     </div>
   );
 }
-
-// Estilos de CSS foram abstraídos para melhor legibilidade no JSX.
-// No seu ficheiro index.css, adicione:
-// .th { @apply px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider; }
-// .td { @apply px-4 py-4 whitespace-nowrap text-sm text-gray-700; }
