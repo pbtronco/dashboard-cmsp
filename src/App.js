@@ -2,35 +2,31 @@ import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, RadialBarChart, RadialBar, PolarAngleAxis } from 'recharts';
 import { LayoutDashboard, Clock, Target, ShieldCheck, Zap, BarChart3, AlertCircle, List } from 'lucide-react';
 
-// Para usar este componente, cole-o no seu ficheiro App.js
-// e instale as dependências necessárias com:
-// npm install recharts lucide-react
-// Certifique-se também de que tem o Tailwind CSS configurado no seu projeto.
 
 export default function App() {
   const [activeView, setActiveView] = useState('dashboard');
 
   // Dados consolidados e enriquecidos com base na análise estratégica
   const chamados = [
-    { id: 'STR 68291', titulo: 'Ficha Funcional do Servidor', prazoContratual: 30, prazoReal: 38, status: 'Entregue com Atraso', reaberturas: 1, categoria: 'Manutenção', justificativaAtraso: 'Mudança de Escopo' },
+    { id: 'STR 68291', titulo: 'Ficha Funcional do Servidor', prazoContratual: 30, prazoReal: 38, status: 'Entregue com Atraso', reaberturas: 1, categoria: 'Manutenção', naturezaReabertura: 'Alterações de Escopo', justificativaAtraso: 'Mudança de Escopo' },
     { id: 'STR 68292', titulo: 'Integração SIM - Justiça Eleitoral', prazoContratual: 60, prazoReal: 28, status: 'Antecipado', reaberturas: 1, categoria: 'Integração' },
     { id: 'STR 68293', titulo: 'Aplicação Banco de Horas', prazoContratual: 55, prazoReal: 35, status: 'Antecipado', reaberturas: 5, categoria: 'Desenvolvimento', naturezaReabertura: 'Refinamento/Escopo' },
-    { id: 'STR 68588', titulo: 'Arquivo TXT PREVCOM', prazoContratual: 30, prazoReal: 75, status: 'Entregue com Atraso', reaberturas: 1, categoria: 'Integração', justificativaAtraso: 'Dependência Cliente' },
+    { id: 'STR 68588', titulo: 'Arquivo TXT PREVCOM', prazoContratual: 30, prazoReal: 75, status: 'Entregue Parcialmente', reaberturas: 1, categoria: 'Integração', justificativaAtraso: 'Aguardando Informações do Cliente' },
     { id: 'STR 68589', titulo: 'Planilhas de Cargos e Salários', prazoContratual: 30, prazoReal: null, status: 'Aguardando Aceite', reaberturas: 3, categoria: 'Desenvolvimento', naturezaReabertura: 'Refinamento/Escopo' },
     { id: 'STR 68591', titulo: 'Tela de Cálculo', prazoContratual: 38, prazoReal: 19, status: 'Antecipado', reaberturas: 0, categoria: 'Melhoria' },
-    { id: 'STR 68592', titulo: 'Índice Rubricas Pensão', prazoContratual: 23, prazoReal: 25, status: 'Entregue com Atraso', reaberturas: 0, categoria: 'Melhoria', justificativaAtraso: 'Dependência Cliente' },
-    { id: 'STR 68599', titulo: 'Grid - Localizar Aplicações', prazoContratual: 20, prazoReal: 20, status: 'No Prazo', reaberturas: 4, categoria: 'Melhoria', naturezaReabertura: 'Mudança de Escopo' },
-    { id: 'STR 68602', titulo: 'Verificador eSocial', prazoContratual: 55, prazoReal: null, status: 'Em Desenvolvimento', reaberturas: 0, categoria: 'Desenvolvimento' },
+    { id: 'STR 68592', titulo: 'Índice Rubricas Pensão', prazoContratual: 23, prazoReal: 25, status: 'Entregue com Atraso', reaberturas: 0, categoria: 'Melhoria', justificativaAtraso: 'Aguardando Informações do Cliente' },
+    { id: 'STR 68599', titulo: 'Grid - Localizar Aplicações', prazoContratual: 20, prazoReal: 20, status: 'Aguardando Aceite', reaberturas: 4, categoria: 'Melhoria', naturezaReabertura: 'Mudança de Escopo' },
+    { id: 'STR 68602', titulo: 'Verificador eSocial', prazoContratual: 55, prazoReal: null, status: 'Entregue Parcialmente', reaberturas: 0, categoria: 'Desenvolvimento', justificativaAtraso: 'Complexidade Técnica Elevada'  },
     { id: 'STR 68605', titulo: 'eSocial S-1200', prazoContratual: 30, prazoReal: null, status: 'Aguardando Cliente', reaberturas: 0, categoria: 'Integração' },
     { id: 'STR 68608', titulo: 'Licença Prêmio (Lei 18.100/2024)', prazoContratual: 50, prazoReal: 47, status: 'Antecipado', reaberturas: 0, categoria: 'Melhoria' },
     { id: 'STR 68610', titulo: 'Gerador de Arquivo Bancário', prazoContratual: 30, prazoReal: 34, status: 'Entregue com Atraso', reaberturas: 0, categoria: 'Melhoria', justificativaAtraso: 'Mudança de Escopo' },
-    { id: 'STR 68611', titulo: 'Alteração da GLIEP dos PMs e GCMs', prazoContratual: 30, prazoReal: 70, status: 'Entregue com Atraso', reaberturas: 0, categoria: 'Melhoria', justificativaAtraso: 'Dependência Cliente' },
-    { id: 'STR 68614', titulo: 'Cálculo Individualizado de Benefícios', prazoContratual: 30, prazoReal: 71, status: 'Entregue com Atraso', reaberturas: 1, categoria: 'Desenvolvimento', justificativaAtraso: 'Dependência Cliente' },
+    { id: 'STR 68611', titulo: 'Alteração da GLIEP dos PMs e GCMs', prazoContratual: 30, prazoReal: 70, status: 'Entregue com Atraso', reaberturas: 0, categoria: 'Melhoria', justificativaAtraso: 'Aguardando Informações do Cliente' },
+    { id: 'STR 68614', titulo: 'Cálculo Individualizado de Benefícios', prazoContratual: 30, prazoReal: 71, status: 'Entregue com Atraso', reaberturas: 1, categoria: 'Desenvolvimento', justificativaAtraso: 'Aguardando Informações do Cliente' },
     { id: 'STR 68616', titulo: 'Botão de Excluir em Cálculo de Benefícios', prazoContratual: 25, prazoReal: 31, status: 'Entregue com Atraso', reaberturas: 0, categoria: 'Melhoria', justificativaAtraso: 'Causa Interna' },
-    { id: 'STR 68617', titulo: 'Incluir Aba de Exceções', prazoContratual: 30, prazoReal: 91, status: 'Entregue com Atraso', reaberturas: 1, categoria: 'Melhoria', justificativaAtraso: 'Dependência Cliente', naturezaReabertura: 'Bug' },
+    { id: 'STR 68617', titulo: 'Incluir Aba de Exceções', prazoContratual: 30, prazoReal: 91, status: 'Entregue com Atraso', reaberturas: 1, categoria: 'Melhoria', justificativaAtraso: 'Aguardando Informações do Cliente', naturezaReabertura: 'Bug' },
     { id: 'STR 68699', titulo: 'Adições à Tela de Favoritos', prazoContratual: 30, prazoReal: 27, status: 'Antecipado', reaberturas: 2, categoria: 'Melhoria', naturezaReabertura: 'Mudança de Escopo' },
     { id: 'STR 68700', titulo: 'Interface Grupos de Cálculo', prazoContratual: 25, prazoReal: null, status: 'Aguardando Aceite', reaberturas: 0, categoria: 'Melhoria' },
-    { id: 'STR 68735', titulo: 'Agrupamento de Relatórios no Gerador', prazoContratual: 30, prazoReal: 31, status: 'Entregue com Atraso', reaberturas: 1, categoria: 'Melhoria', justificativaAtraso: 'Ambiente Cliente', naturezaReabertura: 'Refinamento/Escopo' },
+    { id: 'STR 68735', titulo: 'Agrupamento de Relatórios no Gerador', prazoContratual: 30, prazoReal: 31, status: 'Entregue com Atraso', reaberturas: 1, categoria: 'Melhoria', justificativaAtraso: '', naturezaReabertura: 'Refinamento/Escopo' },
     { id: 'STR 68736', titulo: 'Controle de Acesso a Relatórios', prazoContratual: 66, prazoReal: null, status: 'Em Desenvolvimento', reaberturas: 1, categoria: 'Desenvolvimento', naturezaReabertura: 'Refinamento/Escopo' },
     { id: 'STR 68758', titulo: 'Cálculo de Encargos e Férias', prazoContratual: 14, prazoReal: 28, status: 'Entregue com Atraso', reaberturas: 0, categoria: 'Melhoria', justificativaAtraso: 'Mudança de Escopo' },
     { id: 'STR 68759', titulo: 'Assinatura em Relatório de Licença', prazoContratual: 30, prazoReal: 12, status: 'Antecipado', reaberturas: 1, categoria: 'Melhoria', naturezaReabertura: 'Ajuste Fino' },
@@ -98,7 +94,7 @@ export default function App() {
           <MenuItem icon={LayoutDashboard} label="Dashboard Executivo" view="dashboard" />
           <MenuItem icon={Clock} label="Análise de Prazos" view="prazos" />
           <MenuItem icon={ShieldCheck} label="Análise de Qualidade" view="qualidade" />
-          <MenuItem icon={List} label="Lista de Projetos" view="lista" />
+          <MenuItem icon={List} label="Lista de Chamados" view="lista" />
         </ul>
       </nav>
     </aside>
@@ -144,13 +140,13 @@ export default function App() {
   const DashboardView = () => (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <KpiCard title="Total de Projetos" value={totalChamados} icon={BarChart3} color={{bg: 'bg-blue-100', text: 'text-blue-600'}} />
-        <KpiCard title="Projetos em Andamento" value={chamadosEmAndamento} icon={Zap} color={{bg: 'bg-yellow-100', text: 'text-yellow-600'}} />
-        <KpiCard title="Taxa de Sucesso no Prazo" value={`${taxaSucessoPrazo}%`} icon={Target} color={{bg: 'bg-green-100', text: 'text-green-600'}} subtitle={`${entregasNoPrazoOuMelhor} de ${chamadosFinalizados.length} projetos finalizados`} />
+        <KpiCard title="Total de Chamados" value={totalChamados} icon={BarChart3} color={{bg: 'bg-blue-100', text: 'text-blue-600'}} />
+        <KpiCard title="Chamados em Andamento" value={chamadosEmAndamento} icon={Zap} color={{bg: 'bg-yellow-100', text: 'text-yellow-600'}} />
+        <KpiCard title="Taxa de Sucesso no Prazo" value={`${taxaSucessoPrazo}%`} icon={Target} color={{bg: 'bg-green-100', text: 'text-green-600'}} subtitle={`${entregasNoPrazoOuMelhor} de ${chamadosFinalizados.length} Chamados finalizados`} />
         <KpiCard title="Total de Reaberturas" value={chamados.reduce((a, b) => a + b.reaberturas, 0)} icon={AlertCircle} color={{bg: 'bg-orange-100', text: 'text-orange-600'}} />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="Performance de Entrega (Projetos Finalizados)">
+        <ChartCard title="Performance de Entrega (Chamados Finalizados)">
           <PieChart>
             <Pie data={performanceEntrega} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label={({ name, value }) => `${name}: ${value}`}>
               {performanceEntrega.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.fill} />)}
@@ -268,7 +264,7 @@ export default function App() {
   );
 
   const ListaView = () => (
-     <ChartCard title="Lista Detalhada de Todos os Projetos">
+     <ChartCard title="Lista Detalhada de Todos os Chamados">
          <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 text-sm">
                   <thead className="bg-gray-50">
